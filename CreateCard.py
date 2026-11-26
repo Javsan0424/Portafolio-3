@@ -20,7 +20,7 @@ class Card:
         self.DominoPiece.blit(self.UpperEffectSurf, (0,0))
         self.DominoPiece.blit(self.LowerEffectSurf, (0, self.UpperEffectSurf.get_height()))
 
-        self.DominoPiece = pygame.transform.scale(self.DominoPiece, (self.DominoPiece.get_width()*3, self.DominoPiece.get_height()*3 ))
+        self.DominoPiece = pygame.transform.scale(self.DominoPiece, (self.DominoPiece.get_width()*2, self.DominoPiece.get_height()*2 ))
         self.DominoPieceRect = self.DominoPiece.get_rect(topleft = (0,0))
 
 

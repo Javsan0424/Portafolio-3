@@ -14,5 +14,5 @@ class Player():
     def Damage():
         pass
 
-    def TakeDamage():
-        pass
+    def TakeDamage(self, amount):
+        self.currentHealth = max(0, self.currentHealth - amount)

@@ -4,7 +4,6 @@ import pygame
 pygame.init()
 
 
-
 def ChangeFrame(SkyboxFrame, Image, LastTickUpdate, Tickcount, rateChange ):
     with open('data.json', 'r', encoding='utf-8') as file:
         data = json.load(file)
@@ -17,5 +16,5 @@ def ChangeFrame(SkyboxFrame, Image, LastTickUpdate, Tickcount, rateChange ):
 
         Image = pygame.image.load(data["SkyBox"][str(SkyboxFrame)])
         LastTickUpdate = Tickcount
-        
+
     return SkyboxFrame, Image, LastTickUpdate

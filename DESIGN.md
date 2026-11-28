@@ -1,4 +1,4 @@
-# Witch Hunt: documento de diseño
+# Magick Domino: documento de diseño
 
 ## 1. Resumen de archivos
 

@@ -71,7 +71,7 @@ class MenuState(State):
 
     def Draw(self, Screen):
         UI.DrawOverlay(Screen)
-        UI.DrawCentered(Screen, "Witch Hunt", UI.BigFont, "white", 190)
+        UI.DrawCentered(Screen, "Magick Domino", UI.BigFont, "white", 190)
         UI.DrawCentered(Screen, "Dominó de efectos para dos jugadores", UI.Font, "white", 270)
         if self.App.MenuMessage != "":
             UI.DrawCentered(Screen, self.App.MenuMessage, UI.Font, "yellow", 325)

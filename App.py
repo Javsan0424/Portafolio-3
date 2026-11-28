@@ -16,7 +16,7 @@ class App:
     def __init__(self):
         pygame.init()
         self.Screen = pygame.display.set_mode((UI.ScreenWidth, UI.ScreenHeight))
-        pygame.display.set_caption("Witch Hunt")
+        pygame.display.set_caption("Magick Domino")
         self.Clock = pygame.time.Clock()
         self.Running = True
 

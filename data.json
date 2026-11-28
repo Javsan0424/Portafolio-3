@@ -84,15 +84,16 @@
     },
     "Credits": {
         "Own": [
-            "Código del juego y diseño de reglas: (escribe aquí tu nombre)",
-            "Arte propio: (lista aquí los assets que hiciste tú)"
+            "Código del juego y diseño de reglas: Javier Santos Pérez",
+            "Arte propio: Fichas de Domino, Skybox"
         ],
         "ThirdParty": [
-            "(Nombre del asset) - (autor) - (licencia) - (enlace)"
+            "Domino_sfx_takeChip - poenia - Creative Commons 0 - https://freesound.org/people/poenia/sounds/745032/",
+            "Domino_sfx_moveTile - poenia - Creative Commons 0 - https://freesound.org/people/poenia/sounds/745028/",
+            "Domino_sfx_putOnBoard - poenia - Creative Commons 0 - https://freesound.org/people/poenia/sounds/745030/"
         ],
         "AI": [
-            "Refactor del código y documentación de diseño: asistido con Claude (Anthropic). Edita esta línea según el uso real.",
-            "(Imágenes, música o sonidos generados con IA: herramienta y uso)"
+            "Apoyo en código, Refactor del código, diseño y documentación: asistido con Claude (Anthropic)"
         ]
     }
 }

@@ -1,5 +1,8 @@
 import pygame
+import UI
 from CreateCard import CELL
+from Effects import EffectTypes
+from Events import ChainCut
 
 Cols = 14
 Rows = 9
@@ -15,21 +18,28 @@ class Board:
         self.Pieces = []    # fichas colocadas (para dibujarlas)
         self.Effects = []   # efectos activos (Fuego y Veneno)
 
-    def PieceCells(self, Row, Col, Horizontal):
-        if Horizontal:
+    # Devuelve [casilla de la mitad de arriba, casilla de la mitad de abajo] segun la orientacion:
+    # 0 = vertical, 1 = horizontal (arriba a la izquierda), 2 = vertical invertida, 3 = horizontal invertida
+    # (Row, Col) es siempre la esquina superior izquierda del espacio que ocupa la ficha
+    def PieceCells(self, Row, Col, Orientation):
+        if Orientation == 0:
+            return [(Row, Col), (Row + 1, Col)]
+        if Orientation == 1:
             return [(Row, Col), (Row, Col + 1)]
-        return [(Row, Col), (Row + 1, Col)]
+        if Orientation == 2:
+            return [(Row + 1, Col), (Row, Col)]
+        return [(Row, Col + 1), (Row, Col)]
 
     # Devuelve (plan, motivo). Si la jugada no es valida el plan es None
-    def Evaluate(self, Card, Row, Col, Horizontal):
-        Positions = self.PieceCells(Row, Col, Horizontal)
-        Effects = [Card.UpperEffect, Card.LowerEffect]
+    def Evaluate(self, Upper, Lower, Row, Col, Orientation):
+        Positions = self.PieceCells(Row, Col, Orientation)
+        Effects = [Upper, Lower]
 
         for Pos in Positions:
             if Pos[0] < 0 or Pos[0] >= Rows or Pos[1] < 0 or Pos[1] >= Cols:
                 return None, "La ficha se sale del tablero"
             if Pos in self.Cells:
-                return None, "Esa casilla ya esta ocupada"
+                return None, "Esa casilla ya está ocupada"
 
         Plan = []
         Touching = False
@@ -69,8 +79,8 @@ class Board:
 
         return Plan, ""
 
-    def Place(self, Card, Row, Col, Horizontal, Owner, Plan):
-        Surf = Card.GetSurface(Horizontal)
+    def Place(self, Card, Row, Col, Orientation, Owner, Plan):
+        Surf = Card.GetSurface(Orientation)
         Rect = Surf.get_rect(topleft = (GridRect.x + Col * CELL, GridRect.y + Row * CELL))
         self.Pieces.append({"Surf": Surf, "Rect": Rect, "Owner": Owner})
 
@@ -78,13 +88,13 @@ class Board:
             self.Cells[Item["Pos"]] = {"Effect": Item["Effect"], "Chain": Item["Chain"],
                                        "Owner": Owner, "Cut": False, "Active": None}
 
-    def Resolve(self, Plan, Owner, Players):
-        Rival = 1 - Owner
+    def AddEffect(self, Fx, Cell):
+        self.Effects.append(Fx)
+        Cell["Active"] = Fx
 
+    def Resolve(self, Plan, Owner, Match):
         for Item in Plan:
             Cell = self.Cells[Item["Pos"]]
-            Chain = Item["Chain"]
-            Kind = Item["Effect"]
 
             # Si esta mitad corta, solo corta y no hace dano
             if len(Item["Cuts"]) > 0:
@@ -94,51 +104,30 @@ class Board:
                     if Target["Active"] in self.Effects:
                         self.Effects.remove(Target["Active"])
                     Target["Active"] = None
+                Match.Bus.Publish(ChainCut, Player = Owner, Cells = list(Item["Cuts"]))
                 continue
 
-            if Kind == "Impact":
-                Players[Rival].TakeDamage(6 + 5 * (Chain - 1))
-
-            elif Kind == "Drain":
-                Amount = 3 + 2 * (Chain - 1)
-                Players[Rival].TakeDamage(Amount)
-                Players[Owner].Heal(Amount)
-
-            elif Kind == "Fire":
-                Fx = {"Kind": "Fire", "Owner": Owner, "Value": 12 + 3 * (Chain - 1)}
-                Players[Rival].TakeDamage(Fx["Value"])
-                self.Effects.append(Fx)
-                Cell["Active"] = Fx
-
-            elif Kind == "Poison":
-                Fx = {"Kind": "Poison", "Owner": Owner, "Value": Chain, "Turns": 5}
-                self.Effects.append(Fx)
-                Cell["Active"] = Fx
+            # Strategy: la estrategia del efecto decide que pasa
+            EffectTypes[Item["Effect"]].Apply(Match, self, Cell, Owner, Item["Chain"])
 
     # Se llama al empezar el turno de Victim
-    def Tick(self, Victim, Players):
+    def Tick(self, Victim, Match):
         for Fx in list(self.Effects):
             if Fx["Owner"] == Victim:
                 continue
+            if EffectTypes[Fx["Kind"]].Tick(Match, Fx, Victim):
+                self.Effects.remove(Fx)
 
-            if Fx["Kind"] == "Fire":
-                Fx["Value"] -= 4
-                if Fx["Value"] <= 0:
-                    self.Effects.remove(Fx)
-                else:
-                    Players[Victim].TakeDamage(Fx["Value"])
-
-            elif Fx["Kind"] == "Poison":
-                Players[Victim].TakeDamage(Fx["Value"])
-                Fx["Value"] += 1
-                Fx["Turns"] -= 1
-                if Fx["Turns"] <= 0:
-                    self.Effects.remove(Fx)
-
-    def Draw(self, Screen, Font, Colors):
+    def Draw(self, Screen):
         for Piece in self.Pieces:
             Screen.blit(Piece["Surf"], Piece["Rect"])
-            pygame.draw.rect(Screen, Colors[Piece["Owner"]], Piece["Rect"], 2)
+            pygame.draw.rect(Screen, UI.PlayerColors[Piece["Owner"]], Piece["Rect"], 2)
+
+            # Etiqueta J1/J2 en la esquina de la ficha
+            Tag = UI.TinyFont.render(UI.PlayerTags[Piece["Owner"]], True, "white")
+            TagRect = Tag.get_rect(bottomright = (Piece["Rect"].right - 3, Piece["Rect"].bottom - 3))
+            pygame.draw.rect(Screen, (0, 0, 0), TagRect.inflate(4, 2))
+            Screen.blit(Tag, TagRect)
 
         for Pos in self.Cells:
             Cell = self.Cells[Pos]
@@ -151,5 +140,5 @@ class Board:
                 pygame.draw.line(Screen, "red", CellRect.topleft, CellRect.bottomright, 3)
                 pygame.draw.line(Screen, "red", CellRect.topright, CellRect.bottomleft, 3)
             elif Cell["Chain"] > 1:
-                Text = Font.render("x" + str(Cell["Chain"]), True, "white")
+                Text = UI.SmallFont.render("x" + str(Cell["Chain"]), True, "white")
                 Screen.blit(Text, Text.get_rect(center = CellRect.center))

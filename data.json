@@ -1,17 +1,22 @@
 {
-    "TotalPieces": 24,
-
-    "AvailableCombinations" :["Death", "ForcePlay","ForcePlay","ForcePlay","ForcePlay",  "Exchange",  "Exchange", "Exchange",  "Exchange", "Discard", "Discard", "Discard", "Discard", "Discard", "Discard", "Shield", "Shield", "Shield", "Shield", "Shield", "Shield", "Compare", "Compare", "Compare", "Compare", "Compare", "Compare",  "Pry", "Pry", "Pry","Pry","Pry","Pry", "Investigate", "Investigate", "Investigate", "Investigate", "Investigate", "Investigate", "Investigate", "Investigate", "Investigate", "Investigate", "Investigate", "Investigate", "Investigate", "Investigate", "Investigate"],
-
     "EffectSurface": {
         "Drain": "Assets/Effects/DominoDrainPiece.png",
         "Fire": "Assets/Effects/DominoFirePiece.png",
         "Impact": "Assets/Effects/DominoImpactPiece.png",
         "Poison": "Assets/Effects/DominoPoisionPiece.png"
     },
-
+    "Deck": {
+        "Effects": [
+            "Fire",
+            "Impact",
+            "Drain",
+            "Poison"
+        ],
+        "CopiesPerCombination": 2,
+        "HandSize": 7
+    },
     "SkyBox": {
-        "frames" : 64,
+        "frames": 64,
         "1": "Assets/SkyBox/0001.png",
         "2": "Assets/SkyBox/0002.png",
         "3": "Assets/SkyBox/0003.png",
@@ -76,6 +81,18 @@
         "62": "Assets/SkyBox/0062.png",
         "63": "Assets/SkyBox/0063.png",
         "64": "Assets/SkyBox/0064.png"
+    },
+    "Credits": {
+        "Own": [
+            "Código del juego y diseño de reglas: (escribe aquí tu nombre)",
+            "Arte propio: (lista aquí los assets que hiciste tú)"
+        ],
+        "ThirdParty": [
+            "(Nombre del asset) - (autor) - (licencia) - (enlace)"
+        ],
+        "AI": [
+            "Refactor del código y documentación de diseño: asistido con Claude (Anthropic). Edita esta línea según el uso real.",
+            "(Imágenes, música o sonidos generados con IA: herramienta y uso)"
+        ]
     }
-    
 }
